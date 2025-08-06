@@ -13,14 +13,14 @@ function App() {
     <div style={{ margin: 'auto', width: '500px' }}>
       <Quiz
         quiz={quiz}
-        shuffle
+        // shuffle
         shuffleAnswer
         showInstantFeedback
       // continueTillCorrect
         onComplete={setQuizResult}
         onQuestionSubmit={(obj) => console.log('user question results:', obj)}
         disableSynopsis
-        timer={60}
+        timer={36000}
         allowPauseTimer
         enableProgressBar
       />
