@@ -163,7 +163,35 @@ function Core({
     });
   };
 
-  const renderTags = (answerSelectionType, numberOfSelection, segment) => {
+  const renderNavigation = (navProps) => {
+    // eslint-disable-next-line no-shadow
+    const { showNextQuestionButton, allowNavigation, appLocale: navAppLocale } = navProps;
+    return (
+      (showNextQuestionButton || allowNavigation) && (
+        <div className="questionBtnContainer">
+          {allowNavigation && currentQuestionIndex > 0 && (
+            <button
+              onClick={() => nextQuestion(currentQuestionIndex - 2)}
+              className="prevQuestionBtn btn"
+              type="button"
+            >
+              {navAppLocale.prevQuestionBtn}
+            </button>
+          )}
+
+          <button
+            onClick={() => nextQuestion(currentQuestionIndex)}
+            className="nextQuestionBtn btn"
+            type="button"
+          >
+            {navAppLocale.nextQuestionBtn}
+          </button>
+        </div>
+      )
+    );
+  };
+
+  const renderTags = (answerSelectionType, numberOfSelection, segment, showNavigation) => {
     const {
       singleSelectionTagText,
       multipleSelectionTagText,
@@ -171,15 +199,18 @@ function Core({
     } = appLocale;
 
     return (
-      <div className="tag-container">
-        {answerSelectionType === 'single'
-          && <span className="single selection-tag">{singleSelectionTagText}</span>}
-        {answerSelectionType === 'multiple'
-          && <span className="multiple selection-tag">{multipleSelectionTagText}</span>}
-        <span className="number-of-selection">
-          {pickNumberOfSelection.replace('<numberOfSelection>', numberOfSelection)}
-        </span>
-        {segment && <span className="selection-tag segment">{segment}</span>}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="tag-container">
+          {answerSelectionType === 'single'
+            && <span className="single selection-tag">{singleSelectionTagText}</span>}
+          {answerSelectionType === 'multiple'
+            && <span className="multiple selection-tag">{multipleSelectionTagText}</span>}
+          <span className="number-of-selection">
+            {pickNumberOfSelection.replace('<numberOfSelection>', numberOfSelection)}
+          </span>
+          {segment && <span className="selection-tag segment">{segment}</span>}
+        </div>
+        {showNavigation && renderNavigation({ showNextQuestionButton, allowNavigation, appLocale })}
       </div>
     );
   };
@@ -227,6 +258,7 @@ function Core({
             answerSelectionType,
             question.correctAnswer.length,
             question.segment,
+            false,
           )}
           <div className="result-answer">
             {renderAnswerInResult(question, userInputIndex)}
@@ -444,6 +476,7 @@ function Core({
                   answerSelectionTypeState,
                   activeQuestion.correctAnswer.length,
                   activeQuestion.segment,
+                  true,
                 )}
               <div className="questionModal">
                 <InstantFeedback
@@ -456,27 +489,6 @@ function Core({
                 />
               </div>
               {activeQuestion && renderAnswers(activeQuestion, buttons)}
-              {(showNextQuestionButton || allowNavigation) && (
-                <div className="questionBtnContainer">
-                  {allowNavigation && currentQuestionIndex > 0 && (
-                    <button
-                      onClick={() => nextQuestion(currentQuestionIndex - 2)}
-                      className="prevQuestionBtn btn"
-                      type="button"
-                    >
-                      {appLocale.prevQuestionBtn}
-                    </button>
-                  )}
-
-                  <button
-                    onClick={() => nextQuestion(currentQuestionIndex)}
-                    className="nextQuestionBtn btn"
-                    type="button"
-                  >
-                    {appLocale.nextQuestionBtn}
-                  </button>
-                </div>
-              )}
             </>
           ) : (
             <span className="timerPauseScreen dark:text-white text-black">
