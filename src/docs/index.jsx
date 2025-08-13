@@ -13,14 +13,17 @@ import quiz1_3 from '../../convert/generate/quiz1/quiz3';
 import quiz2_1 from '../../convert/generate/quiz2/quiz1';
 import quiz2_2 from '../../convert/generate/quiz2/quiz2';
 import quiz2_3 from '../../convert/generate/quiz2/quiz3';
+import quiz2_4 from '../../convert/generate/quiz2/quiz4';
 
 import quiz3_1 from '../../convert/generate/quiz3/quiz1';
 import quiz3_2 from '../../convert/generate/quiz3/quiz2';
 import quiz3_3 from '../../convert/generate/quiz3/quiz3';
+import quiz3_4 from '../../convert/generate/quiz3/quiz4';
 
 import quiz4_1 from '../../convert/generate/quiz4/quiz1';
 import quiz4_2 from '../../convert/generate/quiz4/quiz2';
 import quiz4_3 from '../../convert/generate/quiz4/quiz3';
+import quiz4_4 from '../../convert/generate/quiz4/quiz4';
 
 const container = document.getElementById('app');
 const root = createRoot(container);
@@ -45,6 +48,7 @@ const quizCategories = [
       { id: 'q2-1', data: quiz2_1, title: '单选题' },
       { id: 'q2-2', data: quiz2_2, title: '多选题' },
       { id: 'q2-3', data: quiz2_3, title: '判断题' },
+      { id: 'q2-4', data: quiz2_4, title: '案例题' },
     ],
   },
   {
@@ -55,6 +59,7 @@ const quizCategories = [
       { id: 'q3-1', data: quiz3_1, title: '单选题' },
       { id: 'q3-2', data: quiz3_2, title: '多选题' },
       { id: 'q3-3', data: quiz3_3, title: '判断题' },
+      { id: 'q3-4', data: quiz3_4, title: '案例题' },
     ],
   },
   {
@@ -65,6 +70,7 @@ const quizCategories = [
       { id: 'q4-1', data: quiz4_1, title: '单选题' },
       { id: 'q4-2', data: quiz4_2, title: '多选题' },
       { id: 'q4-3', data: quiz4_3, title: '判断题' },
+      { id: 'q4-4', data: quiz4_4, title: '案例题' },
     ],
   },
 ];

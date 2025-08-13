@@ -1,3 +1,6 @@
+/* eslint-disable no-plusplus */
+/* eslint-disable brace-style */
+/* eslint-disable operator-assignment */
 /* eslint-disable arrow-parens */
 /* eslint-disable arrow-body-style */
 /* eslint-disable radix */
@@ -223,6 +226,99 @@ function parseSheet(workbook, sheetName, sheetType, columnMapping) {
   return questions;
 }
 
+// Function to parse case study questions from Excel sheet
+function parseCaseStudySheet(workbook, sheetName, sheetType, columnMapping) {
+  const sheet = workbook.Sheets[sheetName];
+  if (!sheet) {
+    console.log(`Sheet '${sheetName}' not found in workbook`);
+    return [];
+  }
+
+  const data = xlsx.utils.sheet_to_json(sheet, { header: 1 });
+
+  if (data.length > 0) {
+    console.log(`📝 前3行数据预览:`);
+    data.slice(0, 3).forEach((row, index) => {
+      console.log(`  行${index}: [${row.map((cell) => `"${cell}"`).join(', ')}]`);
+    });
+    console.log(`📋 使用列映射:`, columnMapping);
+  }
+
+  const questions = [];
+  let currentCaseNumber = 0;
+  let currentCaseStem = null;
+  let subQuestionNumber = 0;
+
+  data.forEach((row, index) => {
+    if (index === 0) return; // Skip header
+
+    const sequenceNumber = row[columnMapping.sequenceIndex];
+    const questionText = row[columnMapping.questionIndex];
+    const answerText = row[columnMapping.answerIndex];
+    const questionType = row[columnMapping.questionTypeIndex]; // 题型列
+
+    // 检查是否是新的案例题干（有序号且题型为"案例题"且答案为空）
+    if (sequenceNumber && typeof sequenceNumber === 'number'
+        && questionType === '案例题' && (!answerText || answerText === '')) {
+      currentCaseNumber = currentCaseNumber + 1;
+      currentCaseStem = questionText;
+      subQuestionNumber = 0;
+      console.log(`🆕 新案例题干: 案例${currentCaseNumber} - "${currentCaseStem}"`);
+    }
+    // 检查是否是子题目（有题干且题型为"案例题"且有答案）
+    else if (currentCaseStem && questionText
+             && questionType === '案例题' && answerText && answerText !== '') {
+      subQuestionNumber = subQuestionNumber + 1;
+      const combinedQuestion = `${currentCaseStem}\n\n${questionText}`;
+
+      // 收集该子题目的选项
+      const answers = [];
+      const correctAnswer = answerText;
+
+      // 查找后续的选项行
+      let nextRowIndex = index + 1;
+      while (nextRowIndex < data.length) {
+        const nextRow = data[nextRowIndex];
+        const nextSequence = nextRow[columnMapping.sequenceIndex];
+        const nextQuestion = nextRow[columnMapping.questionIndex];
+        const nextType = nextRow[columnMapping.questionTypeIndex];
+        const nextAnswer = nextRow[columnMapping.answerIndex];
+
+        // 如果遇到新的序号，停止收集选项
+        if (nextSequence && typeof nextSequence === 'number') {
+          break;
+        }
+
+        // 如果是选项行（有题目内容但题型不是"案例题"或没有答案）
+        if (nextQuestion && (nextType !== '案例题' || !nextAnswer || nextAnswer === '')) {
+          answers.push(nextQuestion);
+        }
+        // 如果遇到下一个案例子题目，停止收集选项
+        else if (nextQuestion && nextType === '案例题' && nextAnswer && nextAnswer !== '') {
+          break;
+        }
+
+        nextRowIndex++;
+      }
+
+      questions.push({
+        question: combinedQuestion,
+        answers,
+        correctAnswer: convertCorrectAnswer(correctAnswer, sheetType),
+        answerSelectionType: getAnswerSelectionType(sheetType),
+        caseNumber: currentCaseNumber,
+        subQuestionNumber,
+        questionId: `${currentCaseNumber}-${subQuestionNumber}`,
+      });
+
+      console.log(`   ➕ 子题目 ${currentCaseNumber}-${subQuestionNumber}: "${questionText}" (${answers.length}个选项)`);
+    }
+  });
+
+  console.log(`✨ 案例题解析完成，共提取到 ${questions.length} 道子题目`);
+  return questions;
+}
+
 // Process a single Excel file
 function processExcelFile(excelFilePath, quizNumber, quizTitle, sheetNames, columnMapping) {
   console.log(`Processing ${excelFilePath}...`);
@@ -280,6 +376,21 @@ function processExcelFile(excelFilePath, quizNumber, quizTitle, sheetNames, colu
     );
   }
 
+  // Process case study questions -> quiz4.jsx (only for quiz 2, 3, 4)
+  console.log(`\n--- 处理案例题 ---`);
+  const caseQuestions = parseCaseStudySheet(workbook, sheetNames.caseStudy, 'single', columnMapping);
+  if (caseQuestions.length > 0) {
+    generateQuizFile(
+      quizDir,
+      'quiz4.jsx',
+      caseQuestions,
+      caseQuestions.length,
+      `${quizTitle} - 案例题`,
+      `本测验涵盖${quizTitle}的案例题，旨在帮助用户熟悉相关知识点。`,
+      'single',
+    );
+  }
+
   console.log(`✅ 文件处理完成: ${excelFilePath}\n`);
 }
 
@@ -310,11 +421,13 @@ function main() {
         single: '单选',
         multiple: '多选',
         judge: '判断',
+        caseStudy: '案例', // 添加案例题工作表
       },
       columnMapping: {
         sequenceIndex: 0, // 序号在第1列（索引0）
         questionIndex: 3, // 题目在第4列（索引3）
         answerIndex: 4, // 答案在第5列（索引4）
+        questionTypeIndex: 2, // 题型在第3列（索引2）
       },
     },
     {
@@ -325,11 +438,13 @@ function main() {
         single: '单选',
         multiple: '多选',
         judge: '判断',
+        caseStudy: '案例', // 添加案例题工作表
       },
       columnMapping: {
         sequenceIndex: 0,  // 序号在第1列（索引0）
         questionIndex: 3,  // 题目在第4列（索引3）
         answerIndex: 4,    // 答案在第5列（索引4）
+        questionTypeIndex: 2, // 题型在第3列（索引2）
       },
     },
     {
@@ -340,11 +455,13 @@ function main() {
         single: '单选',
         multiple: '多选',
         judge: '判断',
+        caseStudy: '案例', // 添加案例题工作表
       },
       columnMapping: {
         sequenceIndex: 0,  // 序号在第1列（索引0）
         questionIndex: 3,  // 题目在第4列（索引3）
         answerIndex: 4,    // 答案在第5列（索引4）
+        questionTypeIndex: 2, // 题型在第3列（索引2）
       },
     },
   ];
