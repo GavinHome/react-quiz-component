@@ -62,9 +62,9 @@ const quizCategories = [
     title: '建设工程安全生产技术(待更新)',
     synopsis: '包含安全生产技术相关的单选、多选和判断题。',
     subQuizzes: [
-      // { id: 'q4-1', data: quiz4_1, title: '单选题' },
-      // { id: 'q4-2', data: quiz4_2, title: '多选题' },
-      // { id: 'q4-3', data: quiz4_3, title: '判断题' },
+      { id: 'q4-1', data: quiz4_1, title: '单选题' },
+      { id: 'q4-2', data: quiz4_2, title: '多选题' },
+      { id: 'q4-3', data: quiz4_3, title: '判断题' },
     ],
   },
 ];
