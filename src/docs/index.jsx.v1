@@ -6,21 +6,21 @@ import Quiz from '../lib/Quiz';
 
 // 导入所有测验文件
 // 假设每个主模块文件夹(quiz1, quiz2, ...)下都有三个题型文件(quiz1, quiz2, quiz3)
-import quiz1_1 from '../../convert/generate/quiz1/quiz1';
-import quiz1_2 from '../../convert/generate/quiz1/quiz2';
-import quiz1_3 from '../../convert/generate/quiz1/quiz3';
+import quiz1_1 from './quiz1/quiz1';
+import quiz1_2 from './quiz1/quiz2';
+import quiz1_3 from './quiz1/quiz3';
 
-import quiz2_1 from '../../convert/generate/quiz2/quiz1';
-import quiz2_2 from '../../convert/generate/quiz2/quiz2';
-import quiz2_3 from '../../convert/generate/quiz2/quiz3';
+import quiz2_1 from './quiz2/quiz1';
+import quiz2_2 from './quiz2/quiz2';
+import quiz2_3 from './quiz2/quiz3';
 
-import quiz3_1 from '../../convert/generate/quiz3/quiz1';
-import quiz3_2 from '../../convert/generate/quiz3/quiz2';
-import quiz3_3 from '../../convert/generate/quiz3/quiz3';
+import quiz3_1 from './quiz3/quiz1';
+import quiz3_2 from './quiz3/quiz2';
+import quiz3_3 from './quiz3/quiz3';
 
-import quiz4_1 from '../../convert/generate/quiz4/quiz1';
-import quiz4_2 from '../../convert/generate/quiz4/quiz2';
-import quiz4_3 from '../../convert/generate/quiz4/quiz3';
+import quiz4_1 from './quiz4/quiz1';
+import quiz4_2 from './quiz4/quiz2';
+import quiz4_3 from './quiz4/quiz3';
 
 const container = document.getElementById('app');
 const root = createRoot(container);
@@ -59,7 +59,7 @@ const quizCategories = [
   },
   {
     id: 'cat4',
-    title: '建设工程安全生产技术',
+    title: '建设工程安全生产技术(待更新)',
     synopsis: '包含安全生产技术相关的单选、多选和判断题。',
     subQuizzes: [
       { id: 'q4-1', data: quiz4_1, title: '单选题' },
@@ -153,33 +153,17 @@ function App() {
     </div>
   );
 
-  const calculateTimer = (quiz) => {
-    if (!quiz || !quiz.questions) return 3600; // 默认1小时
-
-    const questionCount = quiz.questions.length;
-    let timePerQuestion = 40; // 默认单选题40秒
-
-    // 根据题型调整时间
-    if (quiz.quizTitle && quiz.quizTitle.includes('多选题')) {
-      timePerQuestion = 80; // 多选题每题80秒
-    } else if (quiz.quizTitle && quiz.quizTitle.includes('判断题')) {
-      timePerQuestion = 20; // 判断题每题20秒
-    }
-
-    return questionCount * timePerQuestion;
-  };
-
   const renderQuiz = () => (
     <div>
       <button type="button" onClick={handleGoBackToSubQuizzes} style={{ marginBottom: '20px' }}>&larr; 返回题型选择</button>
       <Quiz
         quiz={selectedQuiz}
-        // shuffleAnswer
+        shuffleAnswer
         showInstantFeedback
         onComplete={setQuizResult}
         onQuestionSubmit={(obj) => console.log('user question results:', obj)}
         disableSynopsis
-        timer={calculateTimer(selectedQuiz)}
+        timer={3600}
         allowPauseTimer
         enableProgressBar
       />
